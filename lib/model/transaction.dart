@@ -27,3 +27,10 @@ class MoneyTransaction {
         commision = map['commision'],
         date = map['date'];
 }
+
+class TransactionsGroupByType {
+  String? type;
+  List<MoneyTransaction> groupedList;
+
+  TransactionsGroupByType(this.type, this.groupedList);
+}
