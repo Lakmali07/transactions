@@ -38,7 +38,7 @@ class DBHelper {
     List<MoneyTransaction> transactions = [];
 
     var results = await _db!.rawQuery(
-        "SELECT transactions.transaction_id,transactions.amount,transactions.transaction_number,transactions.date,transactions.commision,transactions.total,transaction_type.type FROM transactions LEFT JOIN transaction_type ON transactions.type = transaction_type.id");
+        "SELECT transactions.transaction_id,transactions.amount,transactions.transaction_number,transactions.date,transactions.commision,transactions.total,transaction_type.type FROM transactions LEFT JOIN transaction_type ON transactions.type = transaction_type.id WHERE transactions.cancelled IS NULL");
     for (Map result in results) {
       MoneyTransaction transaction =
           MoneyTransaction.fromMap(result as Map<String, dynamic>);
