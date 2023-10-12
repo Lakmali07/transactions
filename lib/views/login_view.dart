@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:transactions/bloc/login_bloc.dart';
 import 'package:transactions/views/transactions_view.dart';
 
 import '../constants/constants.dart';
+import '../utils/response.dart';
 import '../widgets/form_text_field.dart';
+import '../widgets/loading.dart';
 
 class LoginView extends StatefulWidget {
   static const routeName = '/login';
@@ -21,12 +24,20 @@ class _LoginViewState extends State<LoginView> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _showPassword = false;
+  late LoginBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = LoginBloc();
+  }
 
   @override
   void dispose() {
     _passwordFocus.dispose();
     _usernameFocus.dispose();
     _logBtnFocus.dispose();
+    _bloc.dispose();
     super.dispose();
   }
 
@@ -38,9 +49,7 @@ class _LoginViewState extends State<LoginView> {
 
   _validateAndLogin() {
     if (_formKey.currentState!.validate()) {
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => TransactionsView()),
-          (Route<dynamic> route) => false);
+      _bloc.validate(_usernameController.text, _passwordController.text);
     }
   }
 
@@ -99,7 +108,6 @@ class _LoginViewState extends State<LoginView> {
               ButtonTheme(
                 minWidth: 200.0,
                 height: 50.0,
-                // ignore: deprecated_member_use
                 child: RawKeyboardListener(
                   focusNode: _logBtnFocus,
                   autofocus: true,
@@ -125,29 +133,34 @@ class _LoginViewState extends State<LoginView> {
                       }),
                 ),
               ),
-              // loginButton(context, _formKey, _bloc),
-              //forgotPasswordText(context),
               const SizedBox(height: 20),
-              // StreamBuilder<Response<Login>>(
-              //   stream: _bloc.loginStream,
-              //   builder: (context, snapshot) {
-              //     if (snapshot.hasData) {
-              //       switch (snapshot.data!.status) {
-              //         case Status.LOADING:
-              //           return Loading(loadingMessage: snapshot.data!.message);
-              //         case Status.COMPLETED:
-              //           _userDetailsBloc.getUserDetails();
-              //           break;
-              //         case Status.ERROR:
-              //           return Error(
-              //               errorMessage: snapshot.data!.message.toString());
-              //         default:
-              //           break;
-              //       }
-              //     }
-              //     return Container();
-              //   },
-              // ),
+              StreamBuilder<Response<bool>>(
+                stream: _bloc.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    switch (snapshot.data!.status) {
+                      case Status.LOADING:
+                        return Loading(loadingMessage: snapshot.data!.message);
+                      case Status.COMPLETED:
+                        WidgetsBinding.instance.addPostFrameCallback((_) =>
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) => TransactionsView()),
+                                (Route<dynamic> route) => false));
+                        break;
+                      case Status.ERROR:
+                        return Center(
+                            child: Text(
+                          snapshot.data!.message.toString(),
+                          style: TextStyle(color: Colors.red),
+                        ));
+                      default:
+                        break;
+                    }
+                  }
+                  return Container();
+                },
+              ),
             ]),
           ),
         ),

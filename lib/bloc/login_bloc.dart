@@ -3,7 +3,7 @@ import 'dart:async';
 import '../database/database.dart';
 import '../utils/response.dart';
 
-class CancelBloc {
+class LoginBloc {
   StreamController? _controller;
 
   StreamSink<Response<bool>> get sink =>
@@ -11,16 +11,21 @@ class CancelBloc {
   Stream<Response<bool>> get stream =>
       _controller!.stream as Stream<Response<bool>>;
 
-  CancelBloc() {
+  LoginBloc() {
     _controller = StreamController<Response<bool>>();
   }
 
-  cancelTransaction(int id) async {
+  validate(String userName, String password) async {
+    sink.add(Response.loading(''));
     try {
       DBHelper dbHelper = DBHelper();
       await dbHelper.init();
-      bool canceled = await dbHelper.cancelTransaction(id);
-      sink.add(Response.completed(canceled));
+      bool found = await dbHelper.checkUser(userName, password);
+      if (found) {
+        sink.add(Response.completed(found));
+      } else {
+        sink.add(Response.error('Invalid username or password'));
+      }
     } catch (e) {
       sink.add(Response.error(e.toString()));
     }

@@ -18,11 +18,16 @@ class TransactionBloc {
   }
 
   getTransactionsDB() async {
-    DBHelper dbHelper = new DBHelper();
-    await dbHelper.init();
-    List<MoneyTransaction> transactions =
-        await dbHelper.getTransactionDetails();
-    sink.add(ResponseList.completed(transactions));
+    sink.add(ResponseList.loading(''));
+    try {
+      DBHelper dbHelper = DBHelper();
+      await dbHelper.init();
+      List<MoneyTransaction> transactions =
+          await dbHelper.getTransactionDetails();
+      sink.add(ResponseList.completed(transactions));
+    } catch (e) {
+      sink.add(ResponseList.error(e.toString()));
+    }
   }
 
   dispose() {

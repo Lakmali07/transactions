@@ -64,4 +64,18 @@ class DBHelper {
     } finally {}
     return false;
   }
+
+  Future<bool> checkUser(String userName, String password) async {
+    try {
+      final queryResult = await _db?.rawQuery(
+          "SELECT * FROM user WHERE username = '$userName' AND password = '$password'");
+      if (queryResult!.isNotEmpty) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      return false;
+    } finally {}
+  }
 }
