@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:transactions/locator.dart';
+
 import '../database/database.dart';
 import '../utils/response.dart';
 
@@ -18,7 +20,7 @@ class LoginBloc {
   validate(String userName, String password) async {
     sink.add(Response.loading(''));
     try {
-      DBHelper dbHelper = DBHelper();
+      DBHelper dbHelper = locator.get<DBHelper>();
       await dbHelper.init();
       bool found = await dbHelper.checkUser(userName, password);
       if (found) {

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:transactions/locator.dart';
 import 'package:transactions/views/login_view.dart';
-import 'package:transactions/views/transactions_view.dart';
 
 void main() {
+  setup();
   runApp(const MyApp());
 }
 

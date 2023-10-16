@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../database/database.dart';
+import '../locator.dart';
 import '../utils/response.dart';
 
 class CancelBloc {
@@ -17,8 +18,7 @@ class CancelBloc {
 
   cancelTransaction(int id) async {
     try {
-      DBHelper dbHelper = DBHelper();
-      await dbHelper.init();
+      DBHelper dbHelper = locator.get<DBHelper>();
       bool canceled = await dbHelper.cancelTransaction(id);
       sink.add(Response.completed(canceled));
     } catch (e) {

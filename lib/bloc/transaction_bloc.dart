@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:transactions/model/transaction.dart';
 
 import '../database/database.dart';
+import '../locator.dart';
 import '../utils/response.dart';
 
 class TransactionBloc {
@@ -20,8 +21,7 @@ class TransactionBloc {
   getTransactionsDB() async {
     sink.add(ResponseList.loading(''));
     try {
-      DBHelper dbHelper = DBHelper();
-      await dbHelper.init();
+      DBHelper dbHelper = locator.get<DBHelper>();
       List<MoneyTransaction> transactions =
           await dbHelper.getTransactionDetails();
       sink.add(ResponseList.completed(transactions));
